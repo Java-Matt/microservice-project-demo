@@ -1,0 +1,31 @@
+server:
+  port: 8084
+
+spring:
+  mail:
+    host: ${MAIL_HOST:YOUR_EMAIL_HOST}
+    port: ${MAIL_PORT:YOUR_EMAIL_PORT}
+    username: ${MAIL_USERNAME:YOUR_EMAIL_ADDRESS}
+    password: ${MAIL_PASSWORD:YOUR_EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+
+  rabbitmq:
+    addresses: ${RABBIT_ADDRESSES:localhost:5672}
+    username: ${RABBIT_USERNAME:guest}
+    password: ${RABBIT_PASSWORD:guest}
+
+rabbit:
+  rates-queue-name: ${RABBIT_MAIL_QUEUE_NAME:mail_queue}
+
+async:
+  corePoolSize: 3
+  maxPoolSize: 5
+  queueCapacity: 100
+  threadNamePrefix: "MyExecutor-"

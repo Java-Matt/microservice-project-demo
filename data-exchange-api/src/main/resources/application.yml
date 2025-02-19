@@ -1,0 +1,43 @@
+server:
+  port: 8083
+
+spring:
+  rabbitmq:
+    addresses: ${RABBIT_ADDRESSES:localhost:5672}
+    username: ${RABBIT_USERNAME:guest}
+    password: ${RABBIT_PASSWORD:guest}
+
+  datasource:
+    url: jdbc:mysql://${DATABASE_URL:localhost:3306/currency}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.xml
+    drop-first: true
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://${KEYCLOAK_URL:localhost:8080}/realms/${KEYCLOAK_REALM:Exchange}
+          issuer-set-uri: http://${KEYCLOAK_URL:localhost:8080}/realms/${KEYCLOAK_REALM:Exchange}/protocol/openid-connect/certs
+
+jwt:
+  auth:
+    converter:
+      resource-id: exchange-api
+      principle-attribute: preferred_username
+
+rabbit:
+  rates-queue-name: ${RABBIT_MAIL_QUEUE_NAME:mail_queue}
+
+logging:
+  level:
+    org.springframework.security: TRACE

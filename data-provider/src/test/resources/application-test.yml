@@ -1,0 +1,12 @@
+spring:
+  rabbitmq:
+    addresses: localhost:5672
+    username: guest
+    password: guest
+
+rabbit:
+  rates-queue-name: rates_queue
+
+nbp:
+  api:
+    base-url: localhost:9090

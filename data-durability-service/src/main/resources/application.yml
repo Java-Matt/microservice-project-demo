@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  rabbitmq:
+    addresses: ${RABBIT_ADDRESSES:localhost:5672}
+    username: ${RABBIT_USERNAME:guest}
+    password: ${RABBIT_PASSWORD:guest}
+
+  datasource:
+    url: jdbc:mysql://${DATABASE_URL:localhost:3306/currency?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.xml
+    drop-first: true
+
+rabbit:
+  rates-queue-name: ${RABBIT_RATES_QUEUE_NAME:rates_queue}
+
+
+
