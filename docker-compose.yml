@@ -1,0 +1,117 @@
+version: '3.5'
+
+services:
+
+  data-provider:
+    container_name: data-provider
+    build: ../data-provider
+    environment:
+      RABBIT_ADDRESSES: rabbit:5672
+      RABBIT_USERNAME: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_RATES_QUEUE_NAME: rates_queue
+      NBP_BASE_URL: http://api.nbp.pl/api/exchangerates
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbit
+    networks:
+      - exchange
+
+  data-durability-service:
+    container_name: data-durability-service
+    build: ../data-durability-service
+    environment:
+      RABBIT_ADDRESSES: rabbit:5672
+      RABBIT_USERNAME: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_RATES_QUEUE_NAME: rates_queue
+      DATABASE_URL: db:3306/currency
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+    ports:
+      - "8082:8082"
+    depends_on:
+      - rabbit
+      - db
+    networks:
+      - exchange
+
+  data-exchange-api:
+    container_name: data-exchange-api
+    build: ../data-exchange-api
+    environment:
+      RABBIT_ADDRESSES: rabbit:5672
+      RABBIT_USERNAME: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_RATES_QUEUE_NAME: mail_queue
+      DATABASE_URL: db:3306/currency
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      KEYCLOAK_URL: keycloak:8080
+      KEYCLOAK_REALM: Exchange
+    ports:
+      - "8083:8083"
+    depends_on:
+      - rabbit
+      - db
+    networks:
+      - exchange
+
+  mail-service:
+    container_name: mail-service
+    build: ../mail-service
+    environment:
+      RABBIT_ADDRESSES: rabbit:5672
+      RABBIT_USERNAME: guest
+      RABBIT_PASSWORD: guest
+      RABBIT_RATES_QUEUE_NAME: mail_queue
+      MAIL_HOST: YOUR_EMAIL_HOST
+      MAIL_PORT: YOUR_EMAIL_PORT
+      MAIL_USERNAME: YOUR_EMAIL_ADDRESS
+      MAIL_PASSWORD: YOUR_EMAIL_PASSWORD
+    ports:
+      - "8084:8084"
+    depends_on:
+      - rabbit
+    networks:
+      - exchange
+
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - exchange
+
+  db:
+    container_name: db
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: currency
+    ports:
+      - "3306:3306"
+    networks:
+      - exchange
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    entrypoint: [ "/opt/keycloak/bin/kc.sh" ]
+    command:
+      - start-dev
+    volumes:
+      - ./keycloak-data:/opt/keycloak/data
+    networks:
+      - exchange
+
+networks:
+  exchange:
