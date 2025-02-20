@@ -35,6 +35,3 @@ This project is a **learning journey** into the world of **microservices**, **di
 
 This project is **still under development**, and I am continuously improving it as I learn more about microservices and distributed systems. Stay tuned for updates, and feel free to contribute or provide feedback! 🌟
 
----
-
-Let’s build something amazing together! 🚀
